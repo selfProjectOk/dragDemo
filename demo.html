@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <script src="js/jquery-1.10.2.min.js" type="text/javascript"></script>
+</head>
+<style>
+    td {
+        height: 40px;
+        width: 60px;
+        border: black 1px solid;
+    }
+    .moveEle{
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    span {
+        /*background-color: red;*/
+    }
+    table{
+        /*moz-user-select: -moz-none;*/
+        /*-moz-user-select: none;*/
+        /*-o-user-select:none;*/
+        /*-khtml-user-select:none;*/
+        /*-webkit-user-select:none;*/
+        /*-ms-user-select:none;*/
+        /*user-select:none;*/
+    }
+</style>
+<body>
+    <table id="table">
+        <tr>
+            <td title="可拖拽"><span>00</span></td>
+            <td title="可拖拽"><span>01</span></td>
+            <td title="可拖拽"><span>02</span></td>
+            <td title="可拖拽"><span>03</span></td>
+        </tr>
+        <tr>
+            <td title="可拖拽"><span>10</span></td>
+            <td title="可拖拽"><span>11</span></td>
+            <td title="可拖拽"><span>12</span></td>
+            <td title="可拖拽"><span>13</span></td>
+        </tr>
+        <tr>
+            <td title="可拖拽"><span>20</span></td>
+            <td title="可拖拽"><span>21</span></td>
+            <td title="可拖拽"><span>22</span></td>
+            <td title="可拖拽"><span>23</span></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td title="可拖拽"><span>00</span></td>
+            <td title="可拖拽"><span>01</span></td>
+            <td title="可拖拽"><span>02</span></td>
+            <td title="可拖拽"><span>03</span></td>
+        </tr>
+        <tr>
+            <td title="可拖拽"><span>10</span></td>
+            <td title="可拖拽"><span>11</span></td>
+            <td title="可拖拽"><span>12</span></td>
+            <td title="可拖拽"><span>13</span></td>
+        </tr>
+        <tr>
+            <td title="可拖拽"><span>20</span></td>
+            <td title="可拖拽"><span>21</span></td>
+            <td title="可拖拽"><span>22</span></td>
+            <td title="可拖拽"><span>23</span></td>
+        </tr>
+    </table>
+</body>
+<script type="text/javascript">
+    $(function () {
+
+        $('table')[0].onselectstart=function(){return false;};
+
+        var innerHtml = null;
+        var originTarget = null;
+        var goalTarget = null;
+        var moveYclient = null;
+        var moveXclient = null;
+
+        $('#table').on('mousedown', function (e) {
+            if(e.target.nodeName !== 'TD' || $(e.target).parents('#table').size() < 1){
+                return;
+            }
+            innerHtml = e.target.innerHTML;
+            originTarget = e.target;
+            $(originTarget).children().first().toggleClass('moveEle', true);
+            moveYclient = e.clientY;
+            moveXclient = e.clientX;
+        });
+        $('#table').on('mousemove', function (e) {
+            if(e.target.nodeName !== 'TD' || $(e.target).parents('#table').size() < 1){
+                return;
+            }
+            if (moveYclient !== null && moveXclient !== null) {
+                var topValue = parseFloat($(originTarget).children().first().css('top'));
+                $(originTarget).children().first().css('top', topValue + (e.clientY - moveYclient) + 'px');
+                var leftValue = parseFloat($(originTarget).children().first().css('left'));
+                $(originTarget).children().first().css('left', leftValue + (e.clientX - moveXclient) + 'px');
+                moveYclient = e.clientY;
+                moveXclient = e.clientX;
+            }
+        });
+        $(window).on('mouseup', function (e) {
+            goalTarget = e.target;
+            $(originTarget).children().toggleClass('moveEle', false);
+            $(originTarget).children().first().css('top', '0');
+            $(originTarget).children().first().css('left', '0');
+            moveYclient = null;
+            moveXclient = null;
+
+            if(e.target.nodeName !== 'TD' || $(e.target).parents('#table').size() < 1){
+                goalTarget = null;
+                originTarget = null;
+                innerHtml = null;
+                return;
+            }
+            if (innerHtml !== null && originTarget !== null && goalTarget !== null && goalTarget !== originTarget) {
+                if(confirm('是否')){
+                    goalTarget.innerHTML = innerHtml;
+                    originTarget.innerHTML = '';
+                    goalTarget = null;
+                    originTarget = null;
+                    innerHtml = null;
+                } else {
+                    goalTarget = null;
+                    originTarget = null;
+                    innerHtml = null;
+                }
+            } else {
+                goalTarget = null;
+                originTarget = null;
+                innerHtml = null;
+            }
+        });
+    });
+</script>
+</html>
